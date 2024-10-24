@@ -1,0 +1,5 @@
+[main]
+ChequeRejection=Cheque Rejection
+ReasonForRejection=Reason for Rejection
+ReadChequeRejection=Read rejection reason
+WriteChequeRejection=Write rejection reason
