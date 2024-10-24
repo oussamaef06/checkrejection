@@ -6,53 +6,85 @@ class modChequeRejection extends DolibarrModules
 {
     function __construct($db)
     {
-        global $langs, $conf;
-
+        global $langs;
         $this->db = $db;
-        $this->numero = 105000;
+
+        $this->numero = 104000; 
         $this->rights_class = 'chequerejection';
         $this->family = "financial";
         $this->name = preg_replace('/^mod/i', '', get_class($this));
         $this->description = "Module for cheque rejection with reason.";
         $this->version = '1.0';
-        $this->const_name = 'MAIN_MODULE_' . strtoupper($this->name);
-        $this->picto = 'chequerejection@chequerejection';
-        $this->module_parts = array('hooks' => array('compta/paiement/cheque'));
+        $this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
+        $this->picto='chequerejection@mymodule';
+        $this->module_parts = array();
+
+        // Data directories to create when module is enabled
         $this->dirs = array();
 
-        $this->langfiles = array("chequerejection@chequerejection");
+        // Config pages
+        $this->config_page_url = array("chequerejection_setup.php@multicompany");
 
+        $this->langfiles = array("chequerejection@mymodule");
+
+        // Dependencies
+        $this->depends = array();
+        $this->requiredby = array();
+        $this->phpmin = array(5, 3);
+        $this->need_dolibarr_version = array(3, 0);
+
+        // Constants
+        $this->const = array();
+
+        // Define boxes
+        $this->boxes = array();
+
+        // Define rights
         $this->rights = array();
         $r = 0;
         $this->rights[$r][0] = 104001;
-        $this->rights[$r][1] = 'Read chequerejection';
+        $this->rights[$r][1] = 'Read mymodule';
         $this->rights[$r][2] = 'r';
         $this->rights[$r][3] = 0;
         $this->rights[$r][4] = 'read';
         $r++;
-        $this->rights[$r][0] = 104002;
-        $this->rights[$r][1] = 'Write chequerejection';
-        $this->rights[$r][2] = 'w';
-        $this->rights[$r][3] = 0;
-        $this->rights[$r][4] = 'write';
 
+        // Define menus
         $this->menu = array();
         $r = 0;
+
+        // Main menu entry
         $this->menu[$r] = array(
             'fk_menu' => 'fk_mainmenu=compta',
             'type' => 'top',
-            'titre' => 'Cheque Rejection',
-            'mainmenu' => 'chequerejection',
-            'leftmenu' => 'chequerejection_top',
-            'url' => '/custom/chequerejection/page.php',
-            'langs' => 'chequerejection@chequerejection',
-            'position' => 50020,
-            'enabled' => '$conf->chequerejection->enabled',
+            'titre' => 'My Module',
+            'mainmenu' => 'mymodule',
+            'leftmenu' => 'mymodule_top',
+            'url' => '/custom/mymodule/page.php',
+            'langs' => 'mymodule@mymodule',
+            'position' => 50020, // Ensure unique value
+            'enabled' => '$conf->mymodule->enabled',
             'perms' => '1',
             'target' => '',
             'user' => 2
         );
         $r++;
+
+        // Submenu entry
+        $this->menu[$r] = array(
+            'fk_menu' => 'fk_mainmenu=mymodule',
+            'type' => 'left',
+            'titre' => 'Cheque Rejection',
+            'mainmenu' => 'mymodule',
+            'leftmenu' => 'mymodule_rejection',
+            'url' => '/custom/mymodule/subpage.php',
+            'langs' => 'mymodule@mymodule',
+            'position' => 50012, // Ensure unique value
+            'enabled' => '$conf->mymodule->enabled',
+            'perms' => '1',
+            'target' => '',
+            'user' => 2
+        );
     }
 
     function init($options = '')
