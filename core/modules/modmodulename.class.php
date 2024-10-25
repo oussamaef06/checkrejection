@@ -74,42 +74,45 @@ class modmodulename extends DolibarrModules {
 
     function init($options = '') {
         $sql = array();
-
+    
         // Add reason_rejet_cheque column if not exists
         $result = $this->db->query("SHOW COLUMNS FROM llx_paiement LIKE 'reason_rejet_cheque'");
         if ($this->db->num_rows($result) == 0) {
             $sql[] = "ALTER TABLE llx_paiement ADD reason_rejet_cheque TEXT;";
         }
-
+    
         // Hide original cheque folder
         $originalChequeFolder = DOL_DOCUMENT_ROOT . '/compta/paiement/cheque';
         $backupChequeFolder = DOL_DOCUMENT_ROOT . '/compta/paiement/cheque_backup';
-        if (!file_exists($backupChequeFolder)) {
+        if (!file_exists($backupChequeFolder) && file_exists($originalChequeFolder)) {
             rename($originalChequeFolder, $backupChequeFolder);
         }
-
+    
         // Link custom cheque folder
-        symlink(DOL_DOCUMENT_ROOT . '/custom/modulename/cheque', $originalChequeFolder);
-
+        if (!file_exists($originalChequeFolder)) {
+            symlink(DOL_DOCUMENT_ROOT . '/custom/modulename/cheque', $originalChequeFolder);
+        }
+    
         return $this->_init($sql, $options);
     }
-
+    
     function remove($options = '') {
         $sql = array();
         $sql[] = "ALTER TABLE llx_paiement DROP COLUMN reason_rejet_cheque;";
-
+    
         // Remove the custom cheque folder link
         $originalChequeFolder = DOL_DOCUMENT_ROOT . '/compta/paiement/cheque';
         $backupChequeFolder = DOL_DOCUMENT_ROOT . '/compta/paiement/cheque_backup';
         if (is_link($originalChequeFolder)) {
             unlink($originalChequeFolder);
         }
-
+    
         // Restore the original cheque folder
         if (file_exists($backupChequeFolder)) {
             rename($backupChequeFolder, $originalChequeFolder);
         }
-
+    
         return $this->_remove($sql, $options);
     }
+    
 }
