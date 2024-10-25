@@ -19,7 +19,7 @@ class modmodulename extends DolibarrModules {
         $this->langfiles = array("modulename@modulename");
         $this->depends = array(); 
         $this->requiredby = array();
-        $this->conflictwith = array(); // Corrected this line
+        $this->conflictwith = array();
         $this->phpmin = array(5, 3);
         $this->need_dolibarr_version = array(3, 0);
 
@@ -113,4 +113,3 @@ class modmodulename extends DolibarrModules {
         return $this->_remove($sql, $options);
     }
 }
-
