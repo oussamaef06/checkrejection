@@ -1,25 +1,25 @@
 <?php
 include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
-class modchequerejection extends DolibarrModules {
+class modmodulename extends DolibarrModules {
     function __construct($db) {
         global $langs;
         $this->db = $db;
         $this->numero = 104000; 
-        $this->rights_class = 'chequerejection';
+        $this->rights_class = 'modulename';
         $this->family = "financial";
         $this->name = preg_replace('/^mod/i', '', get_class($this));
         $this->description = "Module for cheque rejection with reason.";
         $this->version = '1.0';
         $this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
-        $this->picto='chequerejection@chequerejection';
+        $this->picto='modulename@modulename';
         $this->module_parts = array();
-        $this->dirs = array('/chequerejection');
-        $this->config_page_url = array("chequerejection_setup.php@chequerejection");
-        $this->langfiles = array("chequerejection@chequerejection");
+        $this->dirs = array('/modulename');
+        $this->config_page_url = array("modulename_setup.php@modulename");
+        $this->langfiles = array("modulename@modulename");
         $this->depends = array(); 
         $this->requiredby = array();
-        $this->conflictwith = array();
+        $this->conflictwith = array(); // Corrected this line
         $this->phpmin = array(5, 3);
         $this->need_dolibarr_version = array(3, 0);
 
@@ -30,7 +30,7 @@ class modchequerejection extends DolibarrModules {
         $this->rights = array();
         $r = 0;
         $this->rights[$r][0] = 104001;
-        $this->rights[$r][1] = 'Read chequerejection';
+        $this->rights[$r][1] = 'Read modulename';
         $this->rights[$r][2] = 'r';
         $this->rights[$r][3] = 0;
         $this->rights[$r][4] = 'read';
@@ -43,13 +43,13 @@ class modchequerejection extends DolibarrModules {
         $this->menu[$r] = array(
             'fk_menu' => 'fk_mainmenu=compta',
             'type' => 'top',
-            'titre' => 'Cheque Rejection',
-            'mainmenu' => 'chequerejection',
-            'leftmenu' => 'chequerejection_top',
-            'url' => '/custom/chequerejection/page.php',
-            'langs' => 'chequerejection@chequerejection',
+            'titre' => 'My Module',
+            'mainmenu' => 'modulename',
+            'leftmenu' => 'modulename_top',
+            'url' => '/custom/modulename/page.php',
+            'langs' => 'modulename@modulename',
             'position' => 50010,
-            'enabled' => '$conf->chequerejection->enabled',
+            'enabled' => '$conf->modulename->enabled',
             'perms' => '1',
             'target' => '',
             'user' => 2
@@ -57,15 +57,15 @@ class modchequerejection extends DolibarrModules {
         $r++;
         // Submenu entry
         $this->menu[$r] = array(
-            'fk_menu' => 'fk_mainmenu=chequerejection',
+            'fk_menu' => 'fk_mainmenu=modulename',
             'type' => 'left',
             'titre' => 'Cheque Rejection',
-            'mainmenu' => 'chequerejection',
-            'leftmenu' => 'chequerejection_rejection',
-            'url' => '/custom/chequerejection/subpage.php',
-            'langs' => 'chequerejection@chequerejection',
+            'mainmenu' => 'modulename',
+            'leftmenu' => 'modulename_rejection',
+            'url' => '/custom/modulename/subpage.php',
+            'langs' => 'modulename@modulename',
             'position' => 50011,
-            'enabled' => '$conf->chequerejection->enabled',
+            'enabled' => '$conf->modulename->enabled',
             'perms' => '1',
             'target' => '',
             'user' => 2
@@ -89,7 +89,7 @@ class modchequerejection extends DolibarrModules {
         }
 
         // Link custom cheque folder
-        symlink(DOL_DOCUMENT_ROOT . '/custom/chequerejection/cheque', $originalChequeFolder);
+        symlink(DOL_DOCUMENT_ROOT . '/custom/modulename/cheque', $originalChequeFolder);
 
         return $this->_init($sql, $options);
     }
