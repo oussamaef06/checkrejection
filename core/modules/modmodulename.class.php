@@ -1,25 +1,25 @@
 <?php
 include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
-class modmodulename extends DolibarrModules {
+class modchequerejection extends DolibarrModules {
     function __construct($db) {
         global $langs;
         $this->db = $db;
         $this->numero = 104000; 
-        $this->rights_class = 'modulename';
+        $this->rights_class = 'chequerejection';
         $this->family = "financial";
         $this->name = preg_replace('/^mod/i', '', get_class($this));
         $this->description = "Module for cheque rejection with reason.";
         $this->version = '1.0';
         $this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
-        $this->picto='modulename@modulename';
+        $this->picto='chequerejection@chequerejection';
         $this->module_parts = array();
-        $this->dirs = array('/modulename');
-        $this->config_page_url = array("modulename_setup.php@modulename");
-        $this->langfiles = array("modulename@modulename");
+        $this->dirs = array('/chequerejection');
+        $this->config_page_url = array("chequerejection_setup.php@chequerejection");
+        $this->langfiles = array("chequerejection@chequerejection");
         $this->depends = array(); 
         $this->requiredby = array();
-        $this->conflictwith = array(); // Corrected this line
+        $this->conflictwith = array();
         $this->phpmin = array(5, 3);
         $this->need_dolibarr_version = array(3, 0);
 
@@ -30,7 +30,7 @@ class modmodulename extends DolibarrModules {
         $this->rights = array();
         $r = 0;
         $this->rights[$r][0] = 104001;
-        $this->rights[$r][1] = 'Read modulename';
+        $this->rights[$r][1] = 'Read chequerejection';
         $this->rights[$r][2] = 'r';
         $this->rights[$r][3] = 0;
         $this->rights[$r][4] = 'read';
@@ -43,13 +43,13 @@ class modmodulename extends DolibarrModules {
         $this->menu[$r] = array(
             'fk_menu' => 'fk_mainmenu=compta',
             'type' => 'top',
-            'titre' => 'My Module',
-            'mainmenu' => 'modulename',
-            'leftmenu' => 'modulename_top',
-            'url' => '/custom/modulename/page.php',
-            'langs' => 'modulename@modulename',
+            'titre' => 'Cheque Rejection',
+            'mainmenu' => 'chequerejection',
+            'leftmenu' => 'chequerejection_top',
+            'url' => '/custom/chequerejection/page.php',
+            'langs' => 'chequerejection@chequerejection',
             'position' => 50010,
-            'enabled' => '$conf->modulename->enabled',
+            'enabled' => '$conf->chequerejection->enabled',
             'perms' => '1',
             'target' => '',
             'user' => 2
@@ -57,15 +57,15 @@ class modmodulename extends DolibarrModules {
         $r++;
         // Submenu entry
         $this->menu[$r] = array(
-            'fk_menu' => 'fk_mainmenu=modulename',
+            'fk_menu' => 'fk_mainmenu=chequerejection',
             'type' => 'left',
             'titre' => 'Cheque Rejection',
-            'mainmenu' => 'modulename',
-            'leftmenu' => 'modulename_rejection',
-            'url' => '/custom/modulename/subpage.php',
-            'langs' => 'modulename@modulename',
+            'mainmenu' => 'chequerejection',
+            'leftmenu' => 'chequerejection_rejection',
+            'url' => '/custom/chequerejection/subpage.php',
+            'langs' => 'chequerejection@chequerejection',
             'position' => 50011,
-            'enabled' => '$conf->modulename->enabled',
+            'enabled' => '$conf->chequerejection->enabled',
             'perms' => '1',
             'target' => '',
             'user' => 2
@@ -89,7 +89,7 @@ class modmodulename extends DolibarrModules {
         }
 
         // Link custom cheque folder
-        symlink(DOL_DOCUMENT_ROOT . '/custom/modulename/cheque', $originalChequeFolder);
+        symlink(DOL_DOCUMENT_ROOT . '/custom/chequerejection/cheque', $originalChequeFolder);
 
         return $this->_init($sql, $options);
     }
