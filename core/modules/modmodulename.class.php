@@ -19,14 +19,11 @@ class modmodulename extends DolibarrModules {
         $this->langfiles = array("modulename@modulename");
         $this->depends = array(); 
         $this->requiredby = array();
-        $this->conflictwith = array();
+        $this->conflictwith = array(); 
         $this->phpmin = array(5, 3);
         $this->need_dolibarr_version = array(3, 0);
 
-        // Constants
         $this->const = array();
-
-        // Define rights
         $this->rights = array();
         $r = 0;
         $this->rights[$r][0] = 104001;
@@ -36,10 +33,8 @@ class modmodulename extends DolibarrModules {
         $this->rights[$r][4] = 'read';
         $r++;
 
-        // Define menus
         $this->menu = array();
         $r = 0;
-        // Main menu entry
         $this->menu[$r] = array(
             'fk_menu' => 'fk_mainmenu=compta',
             'type' => 'top',
@@ -55,7 +50,6 @@ class modmodulename extends DolibarrModules {
             'user' => 2
         );
         $r++;
-        // Submenu entry
         $this->menu[$r] = array(
             'fk_menu' => 'fk_mainmenu=modulename',
             'type' => 'left',
@@ -74,45 +68,60 @@ class modmodulename extends DolibarrModules {
 
     function init($options = '') {
         $sql = array();
-    
+
         // Add reason_rejet_cheque column if not exists
         $result = $this->db->query("SHOW COLUMNS FROM llx_paiement LIKE 'reason_rejet_cheque'");
         if ($this->db->num_rows($result) == 0) {
             $sql[] = "ALTER TABLE llx_paiement ADD reason_rejet_cheque TEXT;";
         }
-    
+
         // Hide original cheque folder
         $originalChequeFolder = DOL_DOCUMENT_ROOT . '/compta/paiement/cheque';
         $backupChequeFolder = DOL_DOCUMENT_ROOT . '/compta/paiement/cheque_backup';
         if (!file_exists($backupChequeFolder) && file_exists($originalChequeFolder)) {
             rename($originalChequeFolder, $backupChequeFolder);
         }
-    
-        // Link custom cheque folder
+
         if (!file_exists($originalChequeFolder)) {
             symlink(DOL_DOCUMENT_ROOT . '/custom/modulename/cheque', $originalChequeFolder);
         }
-    
+
+        // Register the hook
+        global $conf;
+        $conf->hooks->add('main', 'modulename', array($this, 'hook'));
+
         return $this->_init($sql, $options);
     }
-    
+
     function remove($options = '') {
+        // Remove customizations
         $sql = array();
         $sql[] = "ALTER TABLE llx_paiement DROP COLUMN reason_rejet_cheque;";
-    
-        // Remove the custom cheque folder link
         $originalChequeFolder = DOL_DOCUMENT_ROOT . '/compta/paiement/cheque';
         $backupChequeFolder = DOL_DOCUMENT_ROOT . '/compta/paiement/cheque_backup';
         if (is_link($originalChequeFolder)) {
             unlink($originalChequeFolder);
         }
-    
-        // Restore the original cheque folder
         if (file_exists($backupChequeFolder)) {
             rename($backupChequeFolder, $originalChequeFolder);
         }
-    
+
+        // Unregister the hook
+        global $conf;
+        $conf->hooks->remove('main', 'modulename', array($this, 'hook'));
+
         return $this->_remove($sql, $options);
     }
-    
+
+    function hook($parameters, &$object, &$action, &$hookmanager)
+    {
+        global $langs, $conf;
+
+        if (in_array('addLeftMenu', $hookmanager->hooks)) {
+            // Use the custom hook class to modify the menu
+            $actionsModulename = new ActionsModulename();
+            $actionsModulename->addLeftMenu($parameters, $langs, $conf, $object, $hookmanager);
+        }
+    }
 }
+
