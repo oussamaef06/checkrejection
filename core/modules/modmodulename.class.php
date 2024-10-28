@@ -5,7 +5,7 @@ class modmodulename extends DolibarrModules {
     function __construct($db) {
         global $langs;
         $this->db = $db;
-        $this->numero = 104000; 
+        $this->numero = 104000;
         $this->rights_class = 'modulename';
         $this->family = "financial";
         $this->name = preg_replace('/^mod/i', '', get_class($this));
@@ -17,16 +17,13 @@ class modmodulename extends DolibarrModules {
         $this->dirs = array('/modulename');
         $this->config_page_url = array("modulename_setup.php@modulename");
         $this->langfiles = array("modulename@modulename");
-        $this->depends = array(); 
+        $this->depends = array();
         $this->requiredby = array();
-        $this->conflictwith = array(); // Corrected this line
+        $this->conflictwith = array();
         $this->phpmin = array(5, 3);
         $this->need_dolibarr_version = array(3, 0);
 
-        // Constants
         $this->const = array();
-
-        // Define rights
         $this->rights = array();
         $r = 0;
         $this->rights[$r][0] = 104001;
@@ -36,10 +33,8 @@ class modmodulename extends DolibarrModules {
         $this->rights[$r][4] = 'read';
         $r++;
 
-        // Define menus
         $this->menu = array();
         $r = 0;
-        // Main menu entry
         $this->menu[$r] = array(
             'fk_menu' => 'fk_mainmenu=compta',
             'type' => 'top',
@@ -55,7 +50,6 @@ class modmodulename extends DolibarrModules {
             'user' => 2
         );
         $r++;
-        // Submenu entry
         $this->menu[$r] = array(
             'fk_menu' => 'fk_mainmenu=modulename',
             'type' => 'left',
@@ -84,12 +78,12 @@ class modmodulename extends DolibarrModules {
         // Hide original cheque folder
         $originalChequeFolder = DOL_DOCUMENT_ROOT . '/compta/paiement/cheque';
         $backupChequeFolder = DOL_DOCUMENT_ROOT . '/compta/paiement/cheque_backup';
-        if (!file_exists($backupChequeFolder)) {
+        if (!file_exists($backupChequeFolder) && file_exists($originalChequeFolder)) {
             rename($originalChequeFolder, $backupChequeFolder);
         }
 
-        // Link custom cheque folder
-        symlink(DOL_DOCUMENT_ROOT . '/custom/modulename/cheque', $originalChequeFolder);
+        // Copy the custom cheque folder to the original location
+        $this->recurse_copy(DOL_DOCUMENT_ROOT . '/custom/modulename/cheque', $originalChequeFolder);
 
         return $this->_init($sql, $options);
     }
@@ -97,13 +91,11 @@ class modmodulename extends DolibarrModules {
     function remove($options = '') {
         $sql = array();
         $sql[] = "ALTER TABLE llx_paiement DROP COLUMN reason_rejet_cheque;";
-
-        // Remove the custom cheque folder link
         $originalChequeFolder = DOL_DOCUMENT_ROOT . '/compta/paiement/cheque';
         $backupChequeFolder = DOL_DOCUMENT_ROOT . '/compta/paiement/cheque_backup';
-        if (is_link($originalChequeFolder)) {
-            unlink($originalChequeFolder);
-        }
+
+        // Remove the custom cheque folder contents
+        $this->recurse_delete($originalChequeFolder);
 
         // Restore the original cheque folder
         if (file_exists($backupChequeFolder)) {
@@ -111,6 +103,42 @@ class modmodulename extends DolibarrModules {
         }
 
         return $this->_remove($sql, $options);
+    }
+
+    private function recurse_copy($src, $dst) {
+        $dir = opendir($src);
+        @mkdir($dst);
+        while (false !== ($file = readdir($dir))) {
+            if (($file != '.') && ($file != '..')) {
+                if (is_dir($src . '/' . $file)) {
+                    $this->recurse_copy($src . '/' . $file, $dst . '/' . $file);
+                } else {
+                    copy($src . '/' . $file, $dst . '/' . $file);
+                }
+            }
+        }
+        closedir($dir);
+    }
+
+    private function recurse_delete($dir) {
+        if (!file_exists($dir)) {
+            return true;
+        }
+        if (!is_dir($dir) || is_link($dir)) {
+            return unlink($dir);
+        }
+        foreach (scandir($dir) as $item) {
+            if ($item == '.' || $item == '..') {
+                continue;
+            }
+            if (!$this->recurse_delete($dir . "/" . $item)) {
+                chmod($dir . "/" . $item, 0777);
+                if (!$this->recurse_delete($dir . "/" . $item)) {
+                    return false;
+                }
+            }
+        }
+        return rmdir($dir);
     }
 }
 ?>
